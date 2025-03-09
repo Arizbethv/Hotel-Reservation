@@ -1,0 +1,78 @@
+#include <stdio.h>
+
+#define MAX_PEOPLE 5
+#define MAX_NIGHTS 30
+
+// Function to get a valid integer input from the user
+int get_int_input(char prompt[]) {
+    int input;
+    printf("%s", prompt);
+    while (scanf("%d", &input) != 1 || input <= 0) {
+        printf("Invalid input. Please enter a positive integer.\n%s", prompt);
+        fflush(stdin);
+    }
+    return input;
+}
+
+// Function to calculate the discount percentage based on age
+float calculate_discount(int age) {
+    float discount = 0.0;
+    if (age > 65) {
+        discount = 0.1;
+    }
+    return discount;
+} 
+// Function to calculate the total cost of the reservation
+float calculate_cost(int num_people, int num_nights, float discount, int *room_type) {
+    float cost = 0.0;
+    switch (num_people) {
+        case 1:
+        case 2:
+            cost = num_nights * 100.0;
+            *room_type = 1;
+            break;
+        case 3:
+        case 4:
+            cost = num_nights * 150.0;
+            *room_type = 2;
+            break;
+        default:
+            printf("Sorry, we cannot accommodate groups of %d people.\n", num_people);
+            break;
+    }
+    cost *= (1.0 - discount);
+    return cost;
+}
+// Function to display the available rooms for a given night
+void display_availability(int night, int availability[][2]) {
+    printf("Rooms available on night %d:\n", night);
+    for (int i = 0; i < 2; i++) {
+        if (availability[night-1][i] == 0) {
+            printf("Room %d\n", i+1);
+        }
+    }
+}
+
+int main() {
+    int num_people, num_nights, room_type = 0, night;
+    int availability[MAX_NIGHTS][2] = {0};  // initialize all rooms as available
+    float discount, cost;
+
+    // Get user input
+    num_people = get_int_input("Enter the number of people on the reservation: ");
+    num_nights = get_int_input("Enter the number of nights: ");
+    night = get_int_input("Enter the night for which you want to check room availability (1-30): ");
+
+    // Calculate discount and cost
+    discount = calculate_discount(get_int_input("Enter the age of the oldest visitor: "));
+    cost = calculate_cost(num_people, num_nights, discount, &room_type);
+// Check room availability
+    display_availability(night, availability);
+
+    // Output results
+    printf("\nReservation details:\n");
+    printf("Room type: %s\n", (room_type == 1 ? "King and sofa bed" : "Two queens"));
+    printf("Total cost: $%.2f\n", cost);
+
+    return 0;
+}
